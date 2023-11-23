@@ -4,6 +4,9 @@
 #include <cstdlib>
 #include <iomanip>
 #include <fstream>
+#include<tuple> // for tuple
+#include <time.h>
+
 
 
 using namespace std;
@@ -14,6 +17,32 @@ struct Placer {
     int numOfComponents, numOfNets, ny, nx;
     vector<vector<int>> nets;
 };
+
+int hpwl(int** core, vector<vector<int>> nets, int nx, int ny, int numOfComponents) {
+    vector<tuple<int, int>> cellPositions(numOfComponents);
+    for (int i = 0; i < nx; i++) {
+        for (int j = 0; j < ny; j++) {
+            if (core[i][j] != EMPTY_CELL) {
+                cellPositions[core[i][j]] = {i, j};
+            }
+        }
+    }
+    int hpwl = 0;
+    for (int i = 0; i < nets.size(); i++) {
+        vector<tuple<int, int>> net;
+        for (int j = 0; j < nets[i].size(); j++) {
+            net.push_back(cellPositions[nets[i][j]]);
+            
+        }
+        int maxX = get<1>(*max_element(net.begin(), net.end(),
+            [](auto& l, auto& r) {return get<0>(l) < get<0>(r);}));
+        int maxY = get<1>(*max_element(net.begin(), net.end(),
+            [](auto& l, auto& r) {return get<0>(l) < get<0>(r);}));
+        hpwl += maxX;
+        hpwl += maxY;
+    }
+    return hpwl;
+}
 
 int** makeCore(int nx, int ny) {
     int** core = new int* [nx];
@@ -94,11 +123,13 @@ Placer makePlacer(string inputFile) {
 }
 
 int main() {
+    srand(time(NULL));
+
     Placer p = makePlacer("C:\\Users\\elsha\\Desktop\\IC\\SimulatedAnealling\\t1.txt");
-    cout << "EMPTY CELL: " << EMPTY_CELL<<endl;
     int** core = makeCore(p.nx, p.ny);
     placeRandomly(core, p.numOfComponents, p.nx, p.ny);
     printToConsole(core, p.nx, p.ny);
-    // todo: hpwl function, temp scheduling, sa algo
+    cout <<"HPWL: " << hpwl(core, p.nets, p.nx, p.ny, p.numOfComponents)<<endl;
+    // todo: temp scheduling, sa algo
     return 0;
 }
