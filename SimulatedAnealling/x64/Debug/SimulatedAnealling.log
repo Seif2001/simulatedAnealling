@@ -1,2 +1,3 @@
 ﻿  main.cpp
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(126,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
   SimulatedAnealling.vcxproj -> C:\Users\elsha\Desktop\IC\SimulatedAnealling\x64\Debug\SimulatedAnealling.exe
