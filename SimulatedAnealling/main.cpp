@@ -39,18 +39,34 @@ int hpwl(int** core, Placer& p) {
     int hpwl = 0;
     for (int i = 0; i < p.nets.size(); i++) {
         vector<tuple<int, int>> net;
+        int maxX = -1;
+        int maxY = -1;
+        int minX = 9999999;
+        int minY = 9999999;
         for (int j = 0; j < p.nets[i].size(); j++) {
-            net.push_back(cellPositions[p.nets[i][j]]);
-
+            int currentX = get<0>(cellPositions[p.nets[i][j]]);
+            int currentY = get<1>(cellPositions[p.nets[i][j]]);
+            if (currentX < minX) {
+                minX = currentX;
+            }
+            if (currentX > maxX) {
+                maxX = currentX;
+            }
+            if (currentY < minY) {
+                minY = currentY;
+            }
+            if (currentY > maxY) {
+                maxY = currentY;
+            }
         }
-        int maxX = get<0>(*max_element(net.begin(), net.end(),
-            [](auto& l, auto& r) {return get<0>(l) < get<0>(r);}));
-        int maxY = get<1>(*max_element(net.begin(), net.end(),
-            [](auto& l, auto& r) {return get<1>(l) < get<1>(r);}));
-        int minX = get<0>(*min_element(net.begin(), net.end(),
-            [](auto& l, auto& r) {return get<0>(l) < get<0>(r);}));
-        int minY = get<1>(*min_element(net.begin(), net.end(),
-            [](auto& l, auto& r) {return get<1>(l) < get<1>(r);}));
+        //int maxX = get<0>(*max_element(net.begin(), net.end(),
+            //[](auto& l, auto& r) {return get<0>(l) < get<0>(r);}));
+        //int maxY = get<1>(*max_element(net.begin(), net.end(),
+            //[](auto& l, auto& r) {return get<1>(l) < get<1>(r);}));
+        //int minX = get<0>(*min_element(net.begin(), net.end(),
+            //[](auto& l, auto& r) {return get<0>(l) < get<0>(r);}));
+        //int minY = get<1>(*min_element(net.begin(), net.end(),
+            //[](auto& l, auto& r) {return get<1>(l) < get<1>(r);}));
         hpwl += (maxX - minX);
         hpwl += (maxY - minY);
     }
@@ -182,7 +198,7 @@ void simulatedAnealing(Placer& p, int** core) {
             swap(Ax,Ay, Bx,By, core);
             //printToConsole(core, p);
             int costF = hpwl(core, p);
-            int deltaCost = costF - costI;
+            int deltaCost = costF - costI;  
             if (deltaCost > 0) {
 
                 core = oldCore;
