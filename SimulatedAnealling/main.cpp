@@ -6,77 +6,90 @@
 #include <fstream>
 #include<tuple> // for tuple
 #include <time.h>
+#include<math.h>
 
 
 
 using namespace std;
 
 const int EMPTY_CELL = -1;
+const int INIT_TEMP = 500;
+const double FINAL_TEMP = 5e-6;
+const float COOLING_RATE = 0.95;
+const int MOVES = 10;
+
 
 struct Placer {
     int numOfComponents, numOfNets, ny, nx;
+    double initialTemp;
+    double finalTemp;
+    int movesPerTemp;
     vector<vector<int>> nets;
 };
 
-int hpwl(int** core, vector<vector<int>> nets, int nx, int ny, int numOfComponents) {
-    vector<tuple<int, int>> cellPositions(numOfComponents);
-    for (int i = 0; i < nx; i++) {
-        for (int j = 0; j < ny; j++) {
+int hpwl(int** core, Placer& p) {
+    vector<tuple<int, int>> cellPositions(p.numOfComponents);
+    for (int i = 0; i < p.nx; i++) {
+        for (int j = 0; j < p.ny; j++) {
             if (core[i][j] != EMPTY_CELL) {
-                cellPositions[core[i][j]] = {i, j};
+                cellPositions[core[i][j]] = { i, j };
             }
         }
     }
     int hpwl = 0;
-    for (int i = 0; i < nets.size(); i++) {
+    for (int i = 0; i < p.nets.size(); i++) {
         vector<tuple<int, int>> net;
-        for (int j = 0; j < nets[i].size(); j++) {
-            net.push_back(cellPositions[nets[i][j]]);
-            
+        for (int j = 0; j < p.nets[i].size(); j++) {
+            net.push_back(cellPositions[p.nets[i][j]]);
+
         }
-        int maxX = get<1>(*max_element(net.begin(), net.end(),
+        int maxX = get<0>(*max_element(net.begin(), net.end(),
             [](auto& l, auto& r) {return get<0>(l) < get<0>(r);}));
         int maxY = get<1>(*max_element(net.begin(), net.end(),
+            [](auto& l, auto& r) {return get<1>(l) < get<1>(r);}));
+        int minX = get<0>(*min_element(net.begin(), net.end(),
             [](auto& l, auto& r) {return get<0>(l) < get<0>(r);}));
-        hpwl += maxX;
-        hpwl += maxY;
+        int minY = get<1>(*min_element(net.begin(), net.end(),
+            [](auto& l, auto& r) {return get<1>(l) < get<1>(r);}));
+        hpwl += (maxX - minX);
+        hpwl += (maxY - minY);
     }
     return hpwl;
 }
 
-int** makeCore(int nx, int ny) {
-    int** core = new int* [nx];
-    for (int i = 0; i < nx; i++) {
-        core[i] = new int[ny];
-        for (int j = 0; j < ny; j++) {
-            core[i][j] = EMPTY_CELL;
+int** makeCore(Placer& p) {
+        int** core = new int* [p.nx];
+        for (int i = 0; i < p.nx; i++) {
+            core[i] = new int[p.ny];
+            for (int j = 0; j < p.ny; j++) {
+                core[i][j] = EMPTY_CELL;
+            }
         }
-    }
-    return core;
+        return core;
 }
 
-void placeRandomly(int** core, int numOfComponents, int nx, int ny) {
-    for (int i = 0; i < numOfComponents; i++) {
-        int row = rand() % nx;
-        int col = rand() %  ny;
+void placeRandomly(int** core, Placer& p) {
+    for (int i = 0; i < p.numOfComponents; i++) {
+        int row = rand() % p.nx;
+        int col = rand() % p.ny;
         bool placed = false;
         while (!placed) {
             if (core[row][col] == EMPTY_CELL) {
                 core[row][col] = i;
                 placed = true;
             }
-            row = rand() % nx;
-            col = rand() % ny;
-            
+            row = rand() % p.nx;
+            col = rand() % p.ny;
+
         }
     }
 }
 
-void printToConsole(int** core, int nx, int ny) {
+void printToConsole(int** core, Placer& p) {
     const int cellWidth = 5;
 
-    for (int i = 0; i < nx; i++) {
-        for (int j = 0; j < ny; j++) {
+    for (int i = 0; i < p.nx; i++) {
+        for (int j = 0; j < p.ny; j++) {
             if (core[i][j] == EMPTY_CELL) {
                 cout << setw(cellWidth) << left << "--";
             }
@@ -86,12 +99,13 @@ void printToConsole(int** core, int nx, int ny) {
         }
         cout << endl;
     }
+    cout << "HPWL: " << hpwl(core, p) << endl;
 }
 
 Placer makePlacer(string inputFile) {
     ifstream file;
     Placer p;
-    
+
     file.open(inputFile);
     if (file.is_open()) { // always check whether the file is open
         file >> p.numOfComponents; // pipe file's content into stream
@@ -104,16 +118,17 @@ Placer makePlacer(string inputFile) {
         for (int i = 0; i < p.numOfNets; i++) {
             int netComponents;
 
-                file >> netComponents;
+            file >> netComponents;
 
             for (int k = 0; k < netComponents; k++) {
                 int comp;
 
-                    file >> comp;
+                file >> comp;
 
                 p.nets[i].push_back(comp);
             }
         }
+        p.movesPerTemp = MOVES * p.numOfComponents;
     }
     else {
         cout << "NO OPEN FILE";
@@ -122,14 +137,83 @@ Placer makePlacer(string inputFile) {
     return p;
 }
 
+void swap(int x1, int y1, int x2, int y2, int **core) {
+    int temp = core[x1][y1];
+    core[x1][y1] = core[x2][y2];
+    core[x2][y2] = temp;
+    //cout << "CELL A " << cellA << endl;
+    //cout << "CELL B " << cellB<<endl;
+}
+
+int** deepCopy(int** core, Placer p) {
+    int** oldCore = new int* [p.nx];
+    for (int i = 0; i < p.nx; i++) {
+        oldCore[i] = new int [p.ny];
+    }
+    
+    for (int x = 0; x < p.nx; x++)
+    {
+        for (int y = 0; y < p.ny; y++)
+        {
+                oldCore[x][y] = core[x][y];
+        }
+    }
+    return oldCore;
+}
+
+void simulatedAnealing(Placer& p, int** core) {
+    int initialCost = hpwl(core, p);
+    p.initialTemp = INIT_TEMP * initialCost;
+    p.finalTemp = FINAL_TEMP * ((double)initialCost / p.numOfNets);
+    double temp = p.initialTemp;
+    const int cols = p.ny;
+    while (temp > p.finalTemp) {
+        for (int i = 0; i < p.movesPerTemp; i++) {
+            int costI = hpwl(core, p);
+            int** oldCore = deepCopy(core, p);
+            int Ax, Ay, Bx, By;
+            do {
+                Ax = rand() % p.nx;
+                Ay = rand() % p.ny;
+                Bx = rand() % p.nx;
+                By = rand() % p.ny;
+            } while (core[Ax][Ay] == core[Bx][By]);
+
+            swap(Ax,Ay, Bx,By, core);
+            //printToConsole(core, p);
+            int costF = hpwl(core, p);
+            int deltaCost = costF - costI;
+            if (deltaCost > 0) {
+
+                core = oldCore;
+
+            }
+            //cout << i << endl;
+            //&& (rand())< (1 - exp((double(-deltaCost)/temp)))
+            //cout << "DELTAAAA: " << deltaCost << endl;
+        }
+
+        printToConsole(core, p);
+
+        if (hpwl(core, p) == 0) {
+            break;
+        }
+        temp = 0.95 * temp;
+    }
+}
+
+
+
 int main() {
     srand(time(NULL));
 
-    Placer p = makePlacer("C:\\Users\\elsha\\Desktop\\IC\\SimulatedAnealling\\t1.txt");
-    int** core = makeCore(p.nx, p.ny);
-    placeRandomly(core, p.numOfComponents, p.nx, p.ny);
-    printToConsole(core, p.nx, p.ny);
-    cout <<"HPWL: " << hpwl(core, p.nets, p.nx, p.ny, p.numOfComponents)<<endl;
+    Placer p = makePlacer("C:\\Users\\elsha\\Desktop\\IC\\SimulatedAnealling\\d0.txt");
+    int** core = makeCore(p);
+    placeRandomly(core, p);
+    printToConsole(core, p);
+
+    simulatedAnealing(p, core);
+
     // todo: temp scheduling, sa algo
     return 0;
 }
