@@ -235,10 +235,10 @@ int main() {
 }
 
 /* The above code has some issues that affects its performance as using dynamic array, 
-and calling deep copy function in a while loop in the simulatedAnnealing function. This can be a performance bottleneck.*/ 
+and calling deep copy function in a while loop in the simulatedAnnealing function. This can be a performance bottleneck, besides the nested loops with N^2 time complexity*/ 
 
 /* The below is an updated function that works with vectors and avoid calling deep copy function in a while loop in the simulatedAnnealing function.
-    Instead, I made a copy only when the move is accepted. */
+    Instead, I made a copy only when the move is accepted, and try to reduce loops complexity to N */
 
 /*
 
