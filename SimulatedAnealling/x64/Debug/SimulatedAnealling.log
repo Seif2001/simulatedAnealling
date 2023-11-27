@@ -1,4 +1,5 @@
-﻿  main.cpp
-C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(19,28): warning C4305: 'initializing': truncation from 'double' to 'float'
-C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(210,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+﻿cl : command line  warning D9002: ignoring unknown option '/std:[c++14|c++latest]'
+  main.cpp
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(21,28): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(217,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
   SimulatedAnealling.vcxproj -> C:\Users\elsha\Desktop\IC\SimulatedAnealling\x64\Debug\SimulatedAnealling.exe

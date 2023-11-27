@@ -8,6 +8,8 @@
 #include <time.h>
 #include<math.h>
 #include<algorithm>
+#include <random>
+
 
 
 
@@ -19,6 +21,12 @@ const double FINAL_TEMP = 5e-6;
 const float COOLING_RATE = 0.95;
 const int MOVES = 10;
 
+struct Cell {
+    int value;
+    int posX;
+    int posY;
+    int net;
+};
 
 struct Placer {
     int numOfComponents, numOfNets, ny, nx;
@@ -27,6 +35,7 @@ struct Placer {
     int movesPerTemp;
     vector<vector<int>> nets;
     vector<tuple<int, int>> cellPositions;
+    vector<Cell> cells;
 };
 
 int hpwl(Placer& p) {
@@ -156,62 +165,64 @@ Placer makePlacer(string inputFile) {
     return p;
 }
 
-void swap(int x, int y, Placer &p) {
-    //tuple<int, int> temp = p.cellPositions[x];
-    //p.cellPositions[x] = p.cellPositions[y];
-    //p.cellPositions[y] = temp;
+void swap(int x, int y, Placer& p) {
     iter_swap(p.cellPositions.begin() + x, p.cellPositions.begin() + y);
-
-    //cout << "CELL A " << cellA << endl;
-    //cout << "CELL B " << cellB<<endl;
 }
 
 
 
 void simulatedAnealing(Placer& p) {
-    int initialCost = hpwl( p);
+    int initialCost = hpwl(p);
     p.initialTemp = INIT_TEMP * initialCost;
-    p.finalTemp = FINAL_TEMP * ((double)initialCost / p.numOfNets);
+    p.finalTemp = FINAL_TEMP * (static_cast<double>(initialCost) / p.numOfNets);
     double temp = p.initialTemp;
     const int cols = p.ny;
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<int> dis(0, (p.nx * p.ny) - 1);
+    uniform_real_distribution<double> dis2(0.0, 1.0);
     vector<tuple<int, int>> oldVec(p.nx * p.ny);
-    int totalCells = p.nx * p.ny;
+    int swap1, swap2, costI, costF, deltaCost;
+
+    costI = initialCost;
+
     while (temp > p.finalTemp) {
         for (int i = 0; i < p.movesPerTemp; i++) {
-            int costI = hpwl(p);
             oldVec = p.cellPositions;
-            int swap1 = rand() % totalCells;
-            int swap2 = rand() % totalCells;
+            swap1 = dis(gen);
+            swap2 = dis(gen);
 
             swap(swap1, swap2, p);
-            int costF = hpwl( p);
-            int deltaCost = costF - costI;
-            if (deltaCost > 0 && (rand()/RAND_MAX) < (1-exp((double(-deltaCost) / temp)))) {
+            costF = hpwl(p);
+            deltaCost = costF - costI;
 
+            if (deltaCost > 0 && (dis2(gen)) < (1 - exp(static_cast<double>(-deltaCost) / temp))) {
                 p.cellPositions = oldVec;
-
             }
-            
+            else {
+                costI = costF;
+            }
         }
 
-        printToConsole( p);
+         printToConsole(p);
 
-       
         temp = 0.95 * temp;
     }
 }
 
 
 
+
 int main() {
     srand(time(NULL));
 
-    Placer p = makePlacer("C:\\Users\\elsha\\Desktop\\IC\\SimulatedAnealling\\d0.txt");
+    Placer p = makePlacer("C:\\Users\\elsha\\Desktop\\IC\\SimulatedAnealling\\t3.txt");
     makeCore(p);
     placeRandomly( p);
     printToConsole(p);
 
     simulatedAnealing(p);
+    printToConsole(p);
 
     // todo: temp scheduling, sa algo
     return 0;
