@@ -1,229 +1,228 @@
-#include <iostream>
-#include <string>
-#include <vector>
-#include <cstdlib>
-#include <iomanip>
-#include <fstream>
-#include<tuple> // for tuple
-#include <time.h>
-#include<math.h>
-#include<algorithm>
-#include <random>
-
-
-
-
+#include <SFML/Graphics.hpp>
+#include "simulatedAnealling.hpp"
+#include<windows.h>
 using namespace std;
 
-const int EMPTY_CELL = -1;
-const int INIT_TEMP = 500;
-const double FINAL_TEMP = 5e-6;
-const float COOLING_RATE = 0.95;
-const int MOVES = 10;
+int main()
+{
+    // Create a window
 
-struct Cell {
-    int value;
-    int posX;
-    int posY;
-    int net;
-};
-
-struct Placer {
-    int numOfComponents, numOfNets, ny, nx;
-    double initialTemp;
-    double finalTemp;
-    int movesPerTemp;
-    vector<vector<int>> nets;
-    vector<tuple<int, int>> cellPositions;
-    vector<Cell> cells;
-};
-
-int hpwl(Placer& p) {
-    
-    int hpwl = 0;
-    for (int i = 0; i < p.nets.size(); i++) {
-        vector<tuple<int, int>> net;
-        int maxX = -1;
-        int maxY = -1;
-        int minX = 9999999;
-        int minY = 9999999;
-        for (int j = 0; j < p.nets[i].size(); j++) {
-            int currentX = get<0>(p.cellPositions[p.nets[i][j]]);
-            int currentY = get<1>(p.cellPositions[p.nets[i][j]]);
-            if (currentX < minX) {
-                minX = currentX;
-            }
-            if (currentX > maxX) {
-                maxX = currentX;
-            }
-            if (currentY < minY) {
-                minY = currentY;
-            }
-            if (currentY > maxY) {
-                maxY = currentY;
-            }
-        }
-        
-        hpwl += (maxX - minX);
-        hpwl += (maxY - minY);
-    }
-    return hpwl;
-}
-
-void makeCore(Placer& p) {
-    p.cellPositions.resize(p.nx * p.ny);
-    for (int i = 0; i < p.nx * p.ny; i++) {
-        p.cellPositions[i] = { 0,0 };
-    }
-
-}
-
-void placeRandomly(Placer& p) {
-    vector<tuple<int, int>> inserted;
-    for (int i = 0; i < p.cellPositions.size(); i++) {
-        int row = rand() % p.nx;
-        int col = rand() % p.ny;
-        bool placed = false;
-
-        while (!placed) {
-            
-            if (find(inserted.begin(), inserted.end(), make_tuple(row,col))==inserted.end()) {
-                p.cellPositions[i] = { row, col };
-                inserted.push_back({ row, col });
-                placed = true;
-            }
-            row = rand() % p.nx;
-            col = rand() % p.ny;
-
-        }
-    }
-
-}
-
-void printToConsole(Placer& p) {
-    int** arr2d = new int* [p.nx];
-    for (int i = 0; i < p.nx; i++) {
-        arr2d[i] = new int[p.ny];
-        for (int j = 0; j < p.ny; j++) {
-            arr2d[i][j] = EMPTY_CELL;
-        }
-    }
-    for (int i = 0; i < p.cellPositions.size(); i++) {
-        if (i < p.numOfComponents) {
-            arr2d[get<0>(p.cellPositions[i])][get<1>(p.cellPositions[i])] = i;
-        }
-    }
-
-    const int cellWidth = 5;
-
-    for (int i = 0; i < p.nx; i++) {
-        for (int j = 0; j < p.ny; j++) {
-            if (arr2d[i][j] == EMPTY_CELL) {
-                cout << setw(cellWidth) << left << "--";
-            }
-            else {
-                cout << setw(cellWidth) << left << arr2d[i][j];
-            }
-        }
-        cout << endl;
-    }
-    cout << "HPWL: " << hpwl(p) << endl;
-}
-
-Placer makePlacer(string inputFile) {
-    ifstream file;
-    Placer p;
-
-    file.open(inputFile);
-    if (file.is_open()) { // always check whether the file is open
-        file >> p.numOfComponents; // pipe file's content into stream
-        file >> p.numOfNets;
-        file >> p.nx;
-        file >> p.ny;
-
-        p.nets.resize(p.numOfNets);
-
-        for (int i = 0; i < p.numOfNets; i++) {
-            int netComponents;
-
-            file >> netComponents;
-
-            for (int k = 0; k < netComponents; k++) {
-                int comp;
-
-                file >> comp;
-
-                p.nets[i].push_back(comp);
-            }
-        }
-        p.movesPerTemp = MOVES * p.numOfComponents;
-    }
-    else {
-        cout << "NO OPEN FILE";
-    }
-
-    return p;
-}
-
-void swap(int x, int y, Placer& p) {
-    iter_swap(p.cellPositions.begin() + x, p.cellPositions.begin() + y);
-}
-
-
-
-void simulatedAnealing(Placer& p) {
-    int initialCost = hpwl(p);
-    p.initialTemp = INIT_TEMP * initialCost;
-    p.finalTemp = FINAL_TEMP * (static_cast<double>(initialCost) / p.numOfNets);
-    double temp = p.initialTemp;
-    const int cols = p.ny;
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<int> dis(0, (p.nx * p.ny) - 1);
-    uniform_real_distribution<double> dis2(0.0, 1.0);
-    vector<tuple<int, int>> oldVec(p.nx * p.ny);
-    int swap1, swap2, costI, costF, deltaCost;
-
-    costI = initialCost;
-
-    while (temp > p.finalTemp) {
-        for (int i = 0; i < p.movesPerTemp; i++) {
-            oldVec = p.cellPositions;
-            swap1 = dis(gen);
-            swap2 = dis(gen);
-
-            swap(swap1, swap2, p);
-            costF = hpwl(p);
-            deltaCost = costF - costI;
-
-            if (deltaCost > 0 && (dis2(gen)) < (1 - exp(static_cast<double>(-deltaCost) / temp))) {
-                p.cellPositions = oldVec;
-            }
-            else {
-                costI = costF;
-            }
-        }
-
-         printToConsole(p);
-
-        temp = 0.95 * temp;
-    }
-}
-
-
-
-
-int main() {
-    srand(time(NULL));
-
-    Placer p = makePlacer("C:\\Users\\elsha\\Desktop\\IC\\SimulatedAnealling\\t3.txt");
+    Placer p = makePlacer("C:\\Users\\elsha\\Desktop\\IC\\SimulatedAnealling\\d1.txt");
     makeCore(p);
-    placeRandomly( p);
-    printToConsole(p);
+    placeRandomly(p);
+    initializeTemp(p);
+    int** grid = getGrid(p);
+    int gridSize = 15;
+    int desiredWidth = p.ny * gridSize;
+    int desiredHeight = p.nx * gridSize;
+    cout << desiredHeight;
+    if (desiredWidth < 800 || desiredHeight < 800) {
+        gridSize *= std::max(800.0 / desiredWidth, 800.0 / desiredHeight);
 
-    simulatedAnealing(p);
-    printToConsole(p);
+    }
+    const int tempBarH = gridSize / 3;
 
-    // todo: temp scheduling, sa algo
+    desiredWidth = p.ny * gridSize;
+    desiredHeight = p.nx * gridSize + tempBarH;
+
+    sf::RenderWindow window(sf::VideoMode(desiredWidth, desiredHeight), "SFML Grid");
+
+
+    // Main loop
+    double temp = p.initialTemp;
+    cout << "Initial temp: " << temp << endl;
+    int hpw;
+
+    sf::Font font;
+    if (!font.loadFromFile("OpenSans-Bold.ttf")) {
+        std::cerr << "Error loading font" << std::endl;
+        return 1; // Return an error code
+    }
+    while (window.isOpen())
+    {
+
+        // Handle events
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+                window.close();
+        }
+
+        // Clear the window
+
+        if (temp > p.finalTemp) {
+            window.clear();
+            sf::RectangleShape tempBar(sf::Vector2f(p.ny * gridSize, tempBarH));
+            tempBar.setPosition(0, 0);
+            tempBar.setOutlineColor(sf::Color::Black);
+            tempBar.setFillColor(sf::Color::White);
+            tempBar.setOutlineThickness(3.0f);
+            window.draw(tempBar);
+
+            sf::RectangleShape tempNow(sf::Vector2f(((double)(temp / p.initialTemp) * (p.ny * gridSize)), tempBarH));
+
+            tempNow.setPosition(0, 0);
+            tempNow.setOutlineColor(sf::Color::Black);
+            tempNow.setFillColor(sf::Color::Red);
+            tempNow.setOutlineThickness(3.0f);
+            window.draw(tempNow);
+
+
+            sf::Text textTemp;
+            textTemp.setFont(font);
+            textTemp.setString(std::to_string(temp) + " °C");
+            textTemp.setFillColor(sf::Color::Black);
+            textTemp.setCharacterSize(tempBarH / 2);
+            textTemp.setOrigin(0, 0);
+
+            // Center the text within the cell
+            sf::FloatRect textRect = textTemp.getLocalBounds();
+            textTemp.setPosition((p.ny / 2.0f) * gridSize - gridSize / 2, tempBarH / 4);
+            window.draw(textTemp);
+
+
+
+
+            grid = getGrid(p);
+            for (int i = 0; i < p.nx; i++) {
+                for (int j = 0; j < p.ny; j++) {
+                    sf::RectangleShape cell(sf::Vector2f(gridSize, gridSize));
+                    cell.setPosition(j * gridSize, (i * gridSize) + tempBarH);
+                    cell.setFillColor(grid[i][j] == -1 ? sf::Color::Black : sf::Color::Blue);
+                    cell.setOutlineThickness(1.f);
+                    cell.setOutlineColor(sf::Color::Black);
+                    window.draw(cell);
+
+                    sf::Text text;
+                    text.setFont(font);
+                    text.setString(grid[i][j] == -1 ? "" : std::to_string(grid[i][j]));  // Convert the number to a string
+                    text.setCharacterSize(gridSize / 2);
+
+                    // Center the text within the cell
+                    sf::FloatRect textRect = text.getLocalBounds();
+                    text.setOrigin(textRect.left + textRect.width / 2.0f, (textRect.top + textRect.height / 2.0f));
+                    text.setPosition(j * gridSize + gridSize / 2.0f, (i * gridSize + gridSize / 2.0f) + tempBarH);
+
+                    // Draw the text
+                    window.draw(text);
+                }
+            }
+
+
+            hpw = hpwl(p);
+            std::cout << hpwl(p) << endl;
+            float hpW = (gridSize / 1.5f) < 50 ? 150 : (gridSize / 1.5f);
+            float hpH = (gridSize / 4) < 50 ? 80 : (gridSize / 4);
+            cout << "HPE" << hpW;
+
+            sf::RectangleShape hpwlRect(sf::Vector2f(hpW, hpH));
+
+            hpwlRect.setPosition(desiredWidth - hpW, desiredHeight - hpH);
+            hpwlRect.setFillColor(sf::Color(255, 255, 255, 128));
+            window.draw(hpwlRect);
+
+            sf::Text textHpwl;
+            textHpwl.setFont(font);
+            textHpwl.setString(std::to_string(hpw));
+            textHpwl.setFillColor(sf::Color::Black);
+            textHpwl.setCharacterSize(hpW / 3);
+            textHpwl.setOrigin(0, 0);
+
+            // Center the text within the cell
+            textHpwl.setPosition(desiredWidth - hpW, desiredHeight - hpH);
+            window.draw(textHpwl);
+
+            window.display();
+
+            sf::sleep(sf::milliseconds((1000 / temp) < 50 ? (1000 / temp) : 50));
+            simulatedAnealing(p, temp);
+            temp = temp * COOLING_RATE;
+        }
+
+        sf::RectangleShape tempBar(sf::Vector2f(p.ny * gridSize, tempBarH));
+        tempBar.setPosition(0, 0);
+        tempBar.setOutlineColor(sf::Color::Black);
+        tempBar.setFillColor(sf::Color::White);
+        tempBar.setOutlineThickness(3.0f);
+        window.draw(tempBar);
+
+        sf::RectangleShape tempNow(sf::Vector2f(((double)(temp / p.initialTemp) * (p.ny * gridSize)) * 10, tempBarH));
+
+        tempNow.setPosition(0, 0);
+        tempNow.setOutlineColor(sf::Color::Black);
+        tempNow.setFillColor(sf::Color::Red);
+        tempNow.setOutlineThickness(3.0f);
+        window.draw(tempNow);
+
+
+        sf::Text textTemp;
+        textTemp.setFont(font);
+        textTemp.setString(std::to_string(temp) + " °C");
+        textTemp.setFillColor(sf::Color::Black);
+        textTemp.setCharacterSize(tempBarH / 2);
+        textTemp.setOrigin(0, 0);
+
+        // Center the text within the cell
+        sf::FloatRect textRect = textTemp.getLocalBounds();
+        textTemp.setPosition((p.ny / 2.0f) * gridSize - gridSize / 2, tempBarH / 4);
+        window.draw(textTemp);
+
+
+        for (int i = 0; i < p.nx; i++) {
+            for (int j = 0; j < p.ny; j++) {
+                sf::RectangleShape cell(sf::Vector2f(gridSize, gridSize));
+                cell.setPosition(j * gridSize, (i * gridSize) + tempBarH);
+                cell.setFillColor(grid[i][j] == -1 ? sf::Color::Black : sf::Color::Blue);
+                cell.setOutlineThickness(1.f);
+                cell.setOutlineColor(sf::Color::Black);
+                window.draw(cell);
+
+                sf::Text text;
+                text.setFont(font);
+                text.setString(grid[i][j] == -1 ? "" : std::to_string(grid[i][j]));  // Convert the number to a string
+                text.setCharacterSize(gridSize / 2);
+
+                // Center the text within the cell
+                sf::FloatRect textRect = text.getLocalBounds();
+                text.setOrigin(textRect.left + textRect.width / 2.0f, (textRect.top + textRect.height / 2.0f));
+                text.setPosition(j * gridSize + gridSize / 2.0f, (i * gridSize + gridSize / 2.0f) + tempBarH);
+
+                // Draw the text
+                window.draw(text);
+            }
+
+
+        }
+
+        hpw = hpwl(p);
+        std::cout << hpwl(p) << endl;
+        float hpW = (gridSize / 1.5f) < 20 ? 30 : (gridSize / 1.5f);
+        float hpH = (gridSize / 4) < 20 ? 30 : (gridSize / 4);
+        sf::RectangleShape hpwlRect(sf::Vector2f(hpW, hpH));
+
+        hpwlRect.setPosition(desiredWidth - hpW / 1.5f, desiredHeight - hpW / 4);
+        hpwlRect.setOutlineColor(sf::Color::Black);
+        hpwlRect.setFillColor(sf::Color(255, 255, 255, 128));
+        hpwlRect.setOutlineThickness(3.0f);
+        window.draw(hpwlRect);
+
+        sf::Text textHpwl;
+        textHpwl.setFont(font);
+        textHpwl.setString("HPWL: " + std::to_string(hpw));
+        textHpwl.setFillColor(sf::Color::Black);
+        textHpwl.setCharacterSize(gridSize / 10);
+        textHpwl.setOrigin(0, 0);
+        window.draw(textHpwl);
+
+        window.display();
+
+
+
+        // Display the content
+    }
+
     return 0;
 }
+
+

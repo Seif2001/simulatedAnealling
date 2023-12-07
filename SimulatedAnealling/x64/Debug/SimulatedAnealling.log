@@ -1,5 +1,109 @@
 ﻿cl : command line  warning D9002: ignoring unknown option '/std:[c++14|c++latest]'
   main.cpp
-C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(21,28): warning C4305: 'initializing': truncation from 'double' to 'float'
-C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(217,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-  SimulatedAnealling.vcxproj -> C:\Users\elsha\Desktop\IC\SimulatedAnealling\x64\Debug\SimulatedAnealling.exe
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\simulatedAnealling.hpp(21,28): warning C4305: 'initializing': truncation from 'double' to 'float'
+  (compiling source file 'main.cpp')
+  
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\simulatedAnealling.hpp(202,11): warning C4305: 'initializing': truncation from '__int64' to 'int'
+  (compiling source file 'main.cpp')
+  
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\simulatedAnealling.hpp(202,13): warning C4309: 'initializing': truncation of constant value
+  (compiling source file 'main.cpp')
+  
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\simulatedAnealling.hpp(252,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  (compiling source file 'main.cpp')
+  
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(20,29): warning C4244: '*=': conversion from 'const _Ty' to 'int', possible loss of data
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(20,29): warning C4244:         with
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(20,29): warning C4244:         [
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(20,29): warning C4244:             _Ty=double
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(20,29): warning C4244:         ]
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(56,70): warning C4244: 'argument': conversion from 'const int' to 'T', possible loss of data
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(56,70): warning C4244:         with
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(56,70): warning C4244:         [
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(56,70): warning C4244:             T=float
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(56,70): warning C4244:         ]
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(56,58): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(56,58): warning C4244:         with
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(56,58): warning C4244:         [
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(56,58): warning C4244:             T=float
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(56,58): warning C4244:         ]
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(63,107): warning C4244: 'argument': conversion from 'const int' to 'T', possible loss of data
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(63,107): warning C4244:         with
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(63,107): warning C4244:         [
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(63,107): warning C4244:             T=float
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(63,107): warning C4244:         ]
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(63,85): warning C4244: 'argument': conversion from 'double' to 'T', possible loss of data
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(63,85): warning C4244:         with
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(63,85): warning C4244:         [
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(63,85): warning C4244:             T=float
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(63,85): warning C4244:         ]
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(81,84): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(90,68): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(90,68): warning C4244:         with
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(90,68): warning C4244:         [
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(90,68): warning C4244:             T=float
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(90,68): warning C4244:         ]
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(90,58): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(90,58): warning C4244:         with
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(90,58): warning C4244:         [
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(90,58): warning C4244:             T=float
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(90,58): warning C4244:         ]
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(91,67): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(91,40): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(116,23): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(129,43): warning C4244: 'argument': conversion from 'float' to 'unsigned int', possible loss of data
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(138,54): warning C4244: 'argument': conversion from 'double' to 'sf::Int32', possible loss of data
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(143,66): warning C4244: 'argument': conversion from 'const int' to 'T', possible loss of data
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(143,66): warning C4244:         with
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(143,66): warning C4244:         [
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(143,66): warning C4244:             T=float
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(143,66): warning C4244:         ]
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(143,54): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(143,54): warning C4244:         with
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(143,54): warning C4244:         [
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(143,54): warning C4244:             T=float
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(143,54): warning C4244:         ]
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(150,108): warning C4244: 'argument': conversion from 'const int' to 'T', possible loss of data
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(150,108): warning C4244:         with
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(150,108): warning C4244:         [
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(150,108): warning C4244:             T=float
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(150,108): warning C4244:         ]
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(150,102): warning C4244: 'argument': conversion from 'double' to 'T', possible loss of data
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(150,102): warning C4244:         with
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(150,102): warning C4244:         [
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(150,102): warning C4244:             T=float
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(150,102): warning C4244:         ]
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(168,80): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(174,64): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(174,64): warning C4244:         with
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(174,64): warning C4244:         [
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(174,64): warning C4244:             T=float
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(174,64): warning C4244:         ]
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(174,54): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(174,54): warning C4244:         with
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(174,54): warning C4244:         [
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(174,54): warning C4244:             T=float
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(174,54): warning C4244:         ]
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(175,63): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(175,36): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(201,19): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+  simulatedAnealling.hpp
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\simulatedAnealling.hpp(21,28): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\simulatedAnealling.hpp(202,11): warning C4305: 'initializing': truncation from '__int64' to 'int'
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\simulatedAnealling.hpp(202,13): warning C4309: 'initializing': truncation of constant value
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\simulatedAnealling.hpp(252,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  Generating Code...
+simulatedAnealling.obj : error LNK2005: "int * * __cdecl getGrid(struct Placer &)" (?getGrid@@YAPEAPEAHAEAUPlacer@@@Z) already defined in main.obj
+simulatedAnealling.obj : error LNK2005: "int __cdecl hpwl(struct Placer &)" (?hpwl@@YAHAEAUPlacer@@@Z) already defined in main.obj
+simulatedAnealling.obj : error LNK2005: "void __cdecl initializeTemp(struct Placer &)" (?initializeTemp@@YAXAEAUPlacer@@@Z) already defined in main.obj
+simulatedAnealling.obj : error LNK2005: "void __cdecl makeCore(struct Placer &)" (?makeCore@@YAXAEAUPlacer@@@Z) already defined in main.obj
+simulatedAnealling.obj : error LNK2005: "struct Placer __cdecl makePlacer(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >)" (?makePlacer@@YA?AUPlacer@@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z) already defined in main.obj
+simulatedAnealling.obj : error LNK2005: "void __cdecl placeRandomly(struct Placer &)" (?placeRandomly@@YAXAEAUPlacer@@@Z) already defined in main.obj
+simulatedAnealling.obj : error LNK2005: "void __cdecl printToConsole(struct Placer &)" (?printToConsole@@YAXAEAUPlacer@@@Z) already defined in main.obj
+simulatedAnealling.obj : error LNK2005: "void __cdecl runSim(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >)" (?runSim@@YAXV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z) already defined in main.obj
+simulatedAnealling.obj : error LNK2005: "void __cdecl simulatedAnealing(struct Placer &,double)" (?simulatedAnealing@@YAXAEAUPlacer@@N@Z) already defined in main.obj
+simulatedAnealling.obj : error LNK2005: "void __cdecl swap(int,int,struct Placer &)" (?swap@@YAXHHAEAUPlacer@@@Z) already defined in main.obj
+simulatedAnealling.obj : error LNK2005: "int costI" (?costI@@3HA) already defined in main.obj
+simulatedAnealling.obj : error LNK2005: "class std::vector<class std::tuple<int,int>,class std::allocator<class std::tuple<int,int> > > oldVec" (?oldVec@@3V?$vector@V?$tuple@HH@std@@V?$allocator@V?$tuple@HH@std@@@2@@std@@A) already defined in main.obj
+simulatedAnealling.obj : error LNK2005: "class std::uniform_real_distribution<double> dis2" (?dis2@@3V?$uniform_real_distribution@N@std@@A) already defined in main.obj
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\x64\Debug\SimulatedAnealling.exe : fatal error LNK1169: one or more multiply defined symbols found
