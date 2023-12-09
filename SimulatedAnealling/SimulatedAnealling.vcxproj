@@ -143,7 +143,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="simulatedAnealling.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\t1.txt" />
