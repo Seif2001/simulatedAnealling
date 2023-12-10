@@ -38,46 +38,9 @@ struct Placer
     vector<int> maxY;
     vector<int> minX;
     vector<int> minY;
-    vector<vector<int>> netX;
-    vector<vector<int>> netY;
 
 };
 
-std::string formatNets(const std::vector<int>& nets)
-{
-    // Format vector of nets as a comma-separated string
-    std::string result = " ";
-    for (size_t i = 0; i < nets.size(); ++i)
-    {
-        result = result + std::to_string(nets[i]);
-        if (i < nets.size() - 1)
-        {
-            result += ", ";
-        }
-    }
-    cout << endl
-        << result << endl;
-
-    return result;
-}
-
-void printTable(const std::vector<std::vector<Cell*>>& netCellPosition)
-{
-    // Print table header
-    printf("%-10s%-10s%-10s%-15s\n", "Index", "Value", "PosX", "Nets");
-
-    // Iterate through the vector of vectors
-    for (size_t i = 0; i < netCellPosition.size(); ++i)
-    {
-        const auto& cellVector = netCellPosition[i];
-
-        // Print data in a table
-        for (const auto& cell : cellVector)
-        {
-            printf("%-10zu%-10d%-10d%-15s%\n", i, cell->value, cell->posX, formatNets(cell->nets).c_str());
-        }
-    }
-}
 
 int hpwl(Placer& p)
 {
@@ -127,7 +90,6 @@ int getHpwl(Placer& p)
         hp += (p.maxX[i] - p.minX[i]);
         hp += (p.maxY[i] - p.minY[i]);
     }
-    cout << "HP: " << hp << endl;
     return hp;
 }
 
@@ -405,9 +367,8 @@ void simulatedAnealing(Placer& p)
             // cout << oldVec[cell1].posY << "        " << p.cellPositions[cell1].posY << endl;
             costF = updateHpwl(costI, cell1, cell2, p);
             deltaCost = costF - costI;
-            // cout << "DELTA: " << deltaCost << endl;
-            //&& (dis2(gen)) < (1 - exp(static_cast<double>(-deltaCost) / temp))
-            if (deltaCost > 0)
+            
+            if (deltaCost > 0 && (dis2(gen)) < (1 - exp(static_cast<double>(-deltaCost) / temp)))
             {
                 p.cellPositions = oldVec;
                 p.maxX = MaxXtemp;
@@ -421,7 +382,7 @@ void simulatedAnealing(Placer& p)
             }
         }
 
-        printToConsole(p);
+        //printToConsole(p);
 
         temp = 0.95 * temp;
     }
@@ -431,13 +392,13 @@ int main()
 {
     srand(time(NULL));
 
-    Placer p = makePlacer("d0.txt");
+    Placer p = makePlacer("t3.txt");
     makeCore(p);
     placeRandomly(p);
     hpwl(p);
-    // printToConsole(p);
+    printToConsole(p);
     simulatedAnealing(p);
-    // printToConsole(p);
+    printToConsole(p);
 
     // todo: temp scheduling, sa algo
     return 0;
