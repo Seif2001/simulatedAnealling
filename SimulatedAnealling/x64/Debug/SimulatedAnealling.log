@@ -1,0 +1,10 @@
+﻿cl : command line  warning D9002: ignoring unknown option '/std:[c++14|c++latest]'
+  main.cpp
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(18,28): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(77,20): warning C4778: 'printf' : unterminated format string '%\n'
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(382,9): warning C4101: 'swapx1': unreferenced local variable
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(382,25): warning C4101: 'swapy1': unreferenced local variable
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(382,33): warning C4101: 'swapy2': unreferenced local variable
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(382,17): warning C4101: 'swapx2': unreferenced local variable
+C:\Users\elsha\Desktop\IC\SimulatedAnealling\SimulatedAnealling\main.cpp(432,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  SimulatedAnealling.vcxproj -> C:\Users\elsha\Desktop\IC\SimulatedAnealling\x64\Debug\SimulatedAnealling.exe
