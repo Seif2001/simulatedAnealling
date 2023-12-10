@@ -17,7 +17,7 @@ using namespace std;
 const int EMPTY_CELL = -1;
 const int INIT_TEMP = 500;
 const double FINAL_TEMP = 5e-6;
-const float COOLING_RATE = 0.95;
+const float COOLING_RATE = 0.75;
 
 const int MOVES = 10;
 
@@ -387,7 +387,7 @@ void simulatedAnealing(Placer &p) {
 
     temp = COOLING_RATE * temp;
 
-    if (temp < (p.finalTemp / 0.95) && temp > p.finalTemp) {
+    if (temp < (p.finalTemp / COOLING_RATE ) && temp > p.finalTemp) {
       printToConsole(p);
       cout << "Temp: " << temp << " " << p.finalTemp << "\n";
       cout << "HPWL: " << costF << "\n";
