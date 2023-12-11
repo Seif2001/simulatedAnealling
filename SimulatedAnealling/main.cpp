@@ -9,6 +9,8 @@
 #include <math.h>
 #include <algorithm>
 #include <random>
+#include <fstream>
+
 
 using namespace std;
 
@@ -235,42 +237,49 @@ void placeRandomly(Placer& p)
     }
 }
 
-void printToConsole(Placer& p)
-{
+void printToConsole(Placer& p) {
     int** arr2d = new int* [p.nx];
-    for (int i = 0; i < p.nx; i++)
-    {
+    for (int i = 0; i < p.nx; i++) {
         arr2d[i] = new int[p.ny];
-        for (int j = 0; j < p.ny; j++)
-        {
+        for (int j = 0; j < p.ny; j++) {
             arr2d[i][j] = EMPTY_CELL;
         }
     }
-    for (int i = 0; i < p.cellPositions.size(); i++)
-    {
-        if (i < p.numOfComponents)
-        {
+    for (int i = 0; i < p.cellPositions.size(); i++) {
+        if (i < p.numOfComponents) {
             arr2d[(p.cellPositions[i]).posX][(p.cellPositions[i]).posY] = i;
         }
     }
 
     const int cellWidth = 5;
 
-    for (int i = 0; i < p.nx; i++)
-    {
-        for (int j = 0; j < p.ny; j++)
-        {
-            if (arr2d[i][j] == EMPTY_CELL)
-            {
+    for (int i = 0; i < p.nx; i++) {
+        for (int j = 0; j < p.ny; j++) {
+            if (arr2d[i][j] == EMPTY_CELL) {
                 cout << setw(cellWidth) << left << "--";
             }
-            else
-            {
+            else {
                 cout << setw(cellWidth) << left << arr2d[i][j];
             }
         }
-        cout << endl;
+        cout << "\n";
     }
+
+    cout << "\n";
+
+    for (int i = 0; i < p.nx; i++) {
+        for (int j = 0; j < p.ny; j++) {
+            if (arr2d[i][j] == EMPTY_CELL) {
+                cout << 1;
+            }
+            else {
+                cout << 0;
+            }
+        }
+        cout << "\n";
+    }
+
+    cout << "\n";
     cout << "HPWL: " << getHpwl(p) << endl;
 }
 
@@ -329,6 +338,9 @@ void swap(int x, int y, Placer& p)
 
 void simulatedAnealing(Placer& p)
 {
+    std::ofstream myfile;
+
+
     int initialCost = getHpwl(p);
     p.initialTemp = INIT_TEMP * initialCost;
     p.finalTemp = FINAL_TEMP * (static_cast<double>(initialCost) / p.numOfNets);
@@ -367,7 +379,7 @@ void simulatedAnealing(Placer& p)
             // cout << oldVec[cell1].posY << "        " << p.cellPositions[cell1].posY << endl;
             costF = updateHpwl(costI, cell1, cell2, p);
             deltaCost = costF - costI;
-            
+
             if (deltaCost > 0 && (dis2(gen)) < (1 - exp(static_cast<double>(-deltaCost) / temp)))
             {
                 p.cellPositions = oldVec;
@@ -382,17 +394,20 @@ void simulatedAnealing(Placer& p)
             }
         }
 
+
         //printToConsole(p);
 
         temp = 0.95 * temp;
     }
+    myfile.close();
+
 }
 
 int main()
 {
-    srand(time(NULL));
+    srand(42);
 
-    Placer p = makePlacer("t3.txt");
+    Placer p = makePlacer("t2.txt");
     makeCore(p);
     placeRandomly(p);
     hpwl(p);
