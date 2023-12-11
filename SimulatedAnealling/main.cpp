@@ -1,14 +1,15 @@
-#include <iostream>
+﻿﻿#include <iostream>
 #include <string>
 #include <vector>
 #include <cstdlib>
 #include <iomanip>
 #include <fstream>
-#include<tuple> // for tuple
+#include <tuple> // for tuple
 #include <time.h>
-#include<math.h>
-#include<algorithm>
-
+#include <math.h>
+#include <algorithm>
+#include <random>
+#include <fstream>
 
 
 using namespace std;
@@ -19,76 +20,221 @@ const double FINAL_TEMP = 5e-6;
 const float COOLING_RATE = 0.95;
 const int MOVES = 10;
 
+struct Cell
+{
+    int value;
+    int posX;
+    int posY;
+    vector<int> nets;
+};
 
-struct Placer {
+struct Placer
+{
     int numOfComponents, numOfNets, ny, nx;
     double initialTemp;
     double finalTemp;
     int movesPerTemp;
     vector<vector<int>> nets;
-    vector<tuple<int, int>> cellPositions;
+    vector<Cell> cellPositions;
+    vector<int> maxX;
+    vector<int> maxY;
+    vector<int> minX;
+    vector<int> minY;
+
 };
 
-int hpwl(Placer& p) {
-    
+
+int hpwl(Placer& p)
+{
+
     int hpwl = 0;
-    for (int i = 0; i < p.nets.size(); i++) {
-        vector<tuple<int, int>> net;
+    for (int i = 0; i < p.nets.size(); i++)
+    {
         int maxX = -1;
         int maxY = -1;
         int minX = 9999999;
         int minY = 9999999;
-        for (int j = 0; j < p.nets[i].size(); j++) {
-            int currentX = get<0>(p.cellPositions[p.nets[i][j]]);
-            int currentY = get<1>(p.cellPositions[p.nets[i][j]]);
-            if (currentX < minX) {
+        for (int j = 0; j < p.nets[i].size(); j++)
+        {
+            int currentX = (p.cellPositions[p.nets[i][j]]).posX;
+            int currentY = (p.cellPositions[p.nets[i][j]]).posY;
+            if (currentX < minX)
+            {
                 minX = currentX;
             }
-            if (currentX > maxX) {
+            if (currentX > maxX)
+            {
                 maxX = currentX;
             }
-            if (currentY < minY) {
+            if (currentY < minY)
+            {
                 minY = currentY;
             }
-            if (currentY > maxY) {
+            if (currentY > maxY)
+            {
                 maxY = currentY;
             }
         }
-        
+        p.maxX[i] = maxX;
+        p.minX[i] = minX;
+        p.maxY[i] = maxY;
+        p.minY[i] = minY;
         hpwl += (maxX - minX);
         hpwl += (maxY - minY);
     }
     return hpwl;
 }
-
-void makeCore(Placer& p) {
-    p.cellPositions.resize(p.nx * p.ny);
-    for (int i = 0; i < p.nx * p.ny; i++) {
-        p.cellPositions[i] = { 0,0 };
+int getHpwl(Placer& p)
+{
+    int hp = 0;
+    for (int i = 0; i < p.numOfNets; i++)
+    {
+        hp += (p.maxX[i] - p.minX[i]);
+        hp += (p.maxY[i] - p.minY[i]);
     }
-
+    return hp;
 }
 
-void placeRandomly(Placer& p) {
+int updateHpwl(int hpwl, int f, int k, Placer& p)
+{
+    Cell x = p.cellPositions[f];
+    Cell y = p.cellPositions[k];
+    for (int net : x.nets)
+    {
+        hpwl -= p.maxX[net];
+        hpwl -= p.maxY[net];
+        hpwl += p.minY[net];
+        hpwl += p.minX[net];
+
+        int maxX = -1;
+        int maxY = -1;
+        int minX = 9999999;
+        int minY = 9999999;
+        for (int j = 0; j < p.nets[net].size(); j++)
+        {
+            int currentX = (p.cellPositions[p.nets[net][j]]).posX;
+            int currentY = (p.cellPositions[p.nets[net][j]]).posY;
+            if (currentX < minX)
+            {
+                minX = currentX;
+            }
+            if (currentX > maxX)
+            {
+                maxX = currentX;
+            }
+            if (currentY < minY)
+            {
+                minY = currentY;
+            }
+            if (currentY > maxY)
+            {
+                maxY = currentY;
+            }
+        }
+        p.maxX[net] = maxX;
+        p.minX[net] = minX;
+        p.maxY[net] = maxY;
+        p.minY[net] = minY;
+
+        hpwl += p.maxX[net];
+        hpwl += p.maxY[net];
+        hpwl -= p.minY[net];
+        hpwl -= p.minX[net];
+
+    }
+
+    for (int net : y.nets)
+    {
+        int maxX = -1;
+        int maxY = -1;
+        int minX = 9999999;
+        int minY = 9999999;
+        hpwl -= p.maxX[net];
+        hpwl -= p.maxY[net];
+        hpwl += p.minY[net];
+        hpwl += p.minX[net];
+        for (int j = 0; j < p.nets[net].size(); j++)
+        {
+            int currentX = (p.cellPositions[p.nets[net][j]]).posX;
+            int currentY = (p.cellPositions[p.nets[net][j]]).posY;
+            if (currentX < minX)
+            {
+                minX = currentX;
+            }
+            if (currentX > maxX)
+            {
+                maxX = currentX;
+            }
+            if (currentY < minY)
+            {
+                minY = currentY;
+            }
+            if (currentY > maxY)
+            {
+                maxY = currentY;
+            }
+        }
+        p.maxX[net] = maxX;
+        p.minX[net] = minX;
+        p.maxY[net] = maxY;
+        p.minY[net] = minY;
+
+        hpwl += p.maxX[net];
+        hpwl += p.maxY[net];
+        hpwl -= p.minY[net];
+        hpwl -= p.minX[net];
+
+    }
+
+
+
+    return hpwl;
+}
+void makeCore(Placer& p)
+{
+    p.cellPositions.resize(p.nx * p.ny);
+    for (int i = 0; i < p.nx * p.ny; i++)
+    {
+        p.cellPositions[i].posX = 0;
+        p.cellPositions[i].posY = 0;
+    }
+}
+
+void placeRandomly(Placer& p)
+{
     vector<tuple<int, int>> inserted;
-    for (int i = 0; i < p.cellPositions.size(); i++) {
+    for (int i = 0; i < p.cellPositions.size(); i++)
+    {
         int row = rand() % p.nx;
         int col = rand() % p.ny;
         bool placed = false;
 
-        while (!placed) {
-            
-            if (find(inserted.begin(), inserted.end(), make_tuple(row,col))==inserted.end()) {
-                p.cellPositions[i] = { row, col };
+        while (!placed)
+        {
+
+            if (find(inserted.begin(), inserted.end(), make_tuple(row, col)) == inserted.end())
+            {
+                p.cellPositions[i].posX = row;
+                p.cellPositions[i].posY = col;
+                p.cellPositions[i].value = i;
                 inserted.push_back({ row, col });
+
                 placed = true;
             }
             row = rand() % p.nx;
             col = rand() % p.ny;
-
         }
     }
 
+    for (int i = 0; i < p.nets.size(); i++)
+    {
+        for (int j = 0; j < p.nets[i].size(); j++)
+        {
+            p.cellPositions[p.nets[i][j]].nets.push_back(i);
+            // cout << p.cellPositions[p.nets[i][j]].value << " " << i;
+        }
+        // cout << endl;
+    }
 }
 
 void printToConsole(Placer& p) {
@@ -101,7 +247,7 @@ void printToConsole(Placer& p) {
     }
     for (int i = 0; i < p.cellPositions.size(); i++) {
         if (i < p.numOfComponents) {
-            arr2d[get<0>(p.cellPositions[i])][get<1>(p.cellPositions[i])] = i;
+            arr2d[(p.cellPositions[i]).posX][(p.cellPositions[i]).posY] = i;
         }
     }
 
@@ -116,30 +262,53 @@ void printToConsole(Placer& p) {
                 cout << setw(cellWidth) << left << arr2d[i][j];
             }
         }
-        cout << endl;
+        cout << "\n";
     }
-    cout << "HPWL: " << hpwl(p) << endl;
+
+    cout << "\n";
+
+    for (int i = 0; i < p.nx; i++) {
+        for (int j = 0; j < p.ny; j++) {
+            if (arr2d[i][j] == EMPTY_CELL) {
+                cout << 1;
+            }
+            else {
+                cout << 0;
+            }
+        }
+        cout << "\n";
+    }
+
+    cout << "\n";
+    cout << "HPWL: " << getHpwl(p) << endl;
 }
 
-Placer makePlacer(string inputFile) {
+Placer makePlacer(string inputFile)
+{
     ifstream file;
     Placer p;
 
     file.open(inputFile);
-    if (file.is_open()) { // always check whether the file is open
+    if (file.is_open())
+    {                              // always check whether the file is open
         file >> p.numOfComponents; // pipe file's content into stream
         file >> p.numOfNets;
         file >> p.nx;
         file >> p.ny;
-
         p.nets.resize(p.numOfNets);
+        p.maxX.resize(p.numOfNets);
+        p.maxY.resize(p.numOfNets);
+        p.minX.resize(p.numOfNets);
+        p.minY.resize(p.numOfNets);
 
-        for (int i = 0; i < p.numOfNets; i++) {
+        for (int i = 0; i < p.numOfNets; i++)
+        {
             int netComponents;
 
             file >> netComponents;
 
-            for (int k = 0; k < netComponents; k++) {
+            for (int k = 0; k < netComponents; k++)
+            {
                 int comp;
 
                 file >> comp;
@@ -149,301 +318,103 @@ Placer makePlacer(string inputFile) {
         }
         p.movesPerTemp = MOVES * p.numOfComponents;
     }
-    else {
+    else
+    {
         cout << "NO OPEN FILE";
     }
 
     return p;
 }
 
-void swap(int x, int y, Placer &p) {
-    //tuple<int, int> temp = p.cellPositions[x];
-    //p.cellPositions[x] = p.cellPositions[y];
-    //p.cellPositions[y] = temp;
-    iter_swap(p.cellPositions.begin() + x, p.cellPositions.begin() + y);
-
-    //cout << "CELL A " << cellA << endl;
-    //cout << "CELL B " << cellB<<endl;
+void swap(int x, int y, Placer& p)
+{
+    int tempx = p.cellPositions[x].posX;
+    int tempy = p.cellPositions[x].posY;
+    p.cellPositions[x].posX = p.cellPositions[y].posX;
+    p.cellPositions[x].posY = p.cellPositions[y].posY;
+    p.cellPositions[y].posX = tempx;
+    p.cellPositions[y].posY = tempy;
 }
 
+void simulatedAnealing(Placer& p)
+{
+    std::ofstream myfile;
 
 
-void simulatedAnealing(Placer& p) {
-    int initialCost = hpwl( p);
+    int initialCost = getHpwl(p);
     p.initialTemp = INIT_TEMP * initialCost;
-    p.finalTemp = FINAL_TEMP * ((double)initialCost / p.numOfNets);
+    p.finalTemp = FINAL_TEMP * (static_cast<double>(initialCost) / p.numOfNets);
     double temp = p.initialTemp;
     const int cols = p.ny;
-    vector<tuple<int, int>> oldVec(p.nx * p.ny);
-    int totalCells = p.nx * p.ny;
-    while (temp > p.finalTemp) {
-        for (int i = 0; i < p.movesPerTemp; i++) {
-            int costI = hpwl(p);
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<int> disy(0, (p.ny) - 1);
+    uniform_int_distribution<int> disx(0, (p.nx) - 1);
+    uniform_int_distribution<int> disC(0, (p.nx * p.ny) - 1);
+    uniform_real_distribution<double> dis2(0.0, 1.0);
+    vector<Cell> oldVec(p.nx * p.ny);
+    int swapx1, swapx2, swapy1, swapy2, costI, costF, deltaCost;
+
+    int cell1, cell2;
+
+    costI = initialCost;
+    int count = 1;
+    vector<int> MaxXtemp(p.numOfNets);
+    vector<int> MaxYtemp(p.numOfNets);
+    vector<int> MinXtemp(p.numOfNets);
+    vector<int> MinYtemp(p.numOfNets);
+    while (temp > p.finalTemp)
+    {
+        for (int i = 0; i < p.movesPerTemp; i++)
+        {
             oldVec = p.cellPositions;
-            int swap1 = rand() % totalCells;
-            int swap2 = rand() % totalCells;
 
-            swap(swap1, swap2, p);
-            int costF = hpwl( p);
-            int deltaCost = costF - costI;
-            if (deltaCost > 0 && (rand()/RAND_MAX) < (1-exp((double(-deltaCost) / temp)))) {
+            cell1 = disC(gen);
+            cell2 = disC(gen);
+            MaxXtemp = p.maxX;
+            MinXtemp = p.minX;
+            MaxYtemp = p.maxY;
+            MinYtemp = p.minY;
+            swap(cell1, cell2, p);
+            // cout << oldVec[cell1].posY << "        " << p.cellPositions[cell1].posY << endl;
+            costF = updateHpwl(costI, cell1, cell2, p);
+            deltaCost = costF - costI;
 
+            if (deltaCost > 0 && (dis2(gen)) < (1 - exp(static_cast<double>(-deltaCost) / temp)))
+            {
                 p.cellPositions = oldVec;
-
+                p.maxX = MaxXtemp;
+                p.minX = MinXtemp;
+                p.maxY = MaxYtemp;
+                p.minY = MinYtemp;
             }
-            
+            else
+            {
+                costI = costF;
+            }
         }
 
-        printToConsole( p);
 
-       
+        //printToConsole(p);
+
         temp = 0.95 * temp;
     }
+    myfile.close();
+
 }
 
+int main()
+{
+    srand(42);
 
-
-int main() {
-    srand(time(NULL));
-
-    Placer p = makePlacer("C:\\Users\\elsha\\Desktop\\IC\\SimulatedAnealling\\d0.txt");
+    Placer p = makePlacer("t2.txt");
     makeCore(p);
-    placeRandomly( p);
+    placeRandomly(p);
+    hpwl(p);
     printToConsole(p);
-
     simulatedAnealing(p);
+    printToConsole(p);
 
     // todo: temp scheduling, sa algo
     return 0;
 }
-
-/* The above code has some issues that affects its performance as using dynamic array, 
-and calling deep copy function in a while loop in the simulatedAnnealing function. This can be a performance bottleneck, besides the nested loops with N^2 time complexity*/ 
-
-/* The below is an updated function that works with vectors and avoid calling deep copy function in a while loop in the simulatedAnnealing function.
-    Instead, I made a copy only when the move is accepted, and try to reduce loops complexity to N */
-
-/*
-
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <cstdlib>
-#include <iomanip>
-#include <ctime>
-#include <cmath>
-#include <chrono>
-#include <algorithm>
-
-using namespace std;
-using namespace chrono;
-
-const int EMPTY_CELL = -1;
-const int INIT_TEMP = 500;
-const double FINAL_TEMP = 5e-6;
-const float COOLING_RATE = 0.95;
-const int MOVES = 10;
-
-struct Placer {
-    int numOfComponents, numOfNets, ny, nx;
-    double initialTemp;
-    double finalTemp;
-    int movesPerTemp;
-    vector<vector<int>> nets;
-};
-
-vector<vector<int>> getCellPositions(const vector<int>& core, Placer& p) {
-    vector<vector<int>> cellPositions(p.numOfComponents, vector<int>(2, 0));
-
-    for (int i = 0; i < p.nx; i++) {
-        for (int j = 0; j < p.ny; j++) {
-            if (core[i * p.ny + j] != EMPTY_CELL) {
-                int component = core[i * p.ny + j];
-                cellPositions[component][0] = i;
-                cellPositions[component][1] = j;
-            }
-        }
-    }
-
-    return cellPositions;
-}
-
-int hpwl(const vector<int>& core, Placer& p) {
-    // auto start = high_resolution_clock::now();
-
-    vector<vector<int>> cellPositions = getCellPositions(core, p);
-    int hpwl = 0;
-
-    for (const auto& net : p.nets) {
-        int maxX = -1, maxY = -1, minX = 9999999, minY = 9999999;
-
-        for (int comp : net) {
-            int currentX = cellPositions[comp][0];
-            int currentY = cellPositions[comp][1];
-
-            minX = min(minX, currentX);
-            maxX = max(maxX, currentX);
-            minY = min(minY, currentY);
-            maxY = max(maxY, currentY);
-        }
-
-        hpwl += (maxX - minX) + (maxY - minY);
-    }
-
-    // auto stop = high_resolution_clock::now();
-    // auto duration = duration_cast<microseconds>(stop - start);
-    // cout << "hpwl Execution Time: " << duration.count() << " microseconds" << endl;
-
-    return hpwl;
-}
-
-vector<int> makeCore(Placer& p) {
-    auto start = high_resolution_clock::now();
-
-    vector<int> core(p.nx * p.ny, EMPTY_CELL);
-
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop - start);
-    cout << "makeCore Execution Time: " << duration.count() << " microseconds" << endl;
-
-    return core;
-}
-
-void placeRandomly(vector<int>& core, Placer& p) {
-    auto start = high_resolution_clock::now();
-
-    for (int i = 0; i < p.numOfComponents; i++) {
-        int pos = rand() % (p.nx * p.ny);
-        while (core[pos] != EMPTY_CELL) {
-            pos = rand() % (p.nx * p.ny);
-        }
-        core[pos] = i;
-    }
-
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop - start);
-    cout << "placeRandomly Execution Time: " << duration.count() << " microseconds" << endl;
-}
-
-void printToConsole(const vector<int>& core, Placer& p) {
-    auto start = high_resolution_clock::now();
-    const int cellWidth = 5;
-
-    for (int i = 0; i < p.nx * p.ny; i++) {
-        if (core[i] == EMPTY_CELL) {
-            cout << setw(cellWidth) << left << "--";
-        } else {
-            cout << setw(cellWidth) << left << core[i];
-        }
-
-        // Print a newline after every p.ny elements
-        if ((i + 1) % p.ny == 0) {
-            cout << endl;
-        }
-    }
-
-    cout << "HPWL: " << hpwl(core, p) << endl;
-
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop - start);
-    cout << "printToConsole Execution Time: " << duration.count() << " microseconds" << endl;
-}
-
-Placer makePlacer(string inputFile) {
-    auto start = high_resolution_clock::now();
-    ifstream file(inputFile);
-
-    if (!file.is_open()) {
-        cerr << "Error: Could not open file " << inputFile << endl;
-        exit(EXIT_FAILURE);
-    }
-
-    Placer p;
-    file >> p.numOfComponents >> p.numOfNets >> p.nx >> p.ny;
-
-    p.nets.resize(p.numOfNets);
-
-    for (int i = 0; i < p.numOfNets; i++) {
-        int netComponents;
-        file >> netComponents;
-
-        p.nets[i].resize(netComponents);
-
-        for (int k = 0; k < netComponents; k++) {
-            file >> p.nets[i][k];
-        }
-    }
-
-    p.movesPerTemp = MOVES * p.numOfComponents;
-
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop - start);
-    cout << "makePlacer Execution Time: " << duration.count() << " microseconds" << endl;
-
-    return p;
-}
-
-void swap(int x1, int y1, int x2, int y2, vector<int>& core, Placer& p) {
-    int temp = core[x1 * p.ny + y1];
-    core[x1 * p.ny + y1] = core[x2 * p.ny + y2];
-    core[x2 * p.ny + y2] = temp;
-}
-
-void simulatedAnnealing(Placer& p, vector<int>& core) {
-    auto start = high_resolution_clock::now();
-
-    int initialCost = hpwl(core, p);
-    p.initialTemp = INIT_TEMP * initialCost;
-    p.finalTemp = FINAL_TEMP * ((double)initialCost / p.numOfNets);
-    double temp = p.initialTemp;
-
-    while (temp > p.finalTemp) {
-        for (int i = 0; i < p.movesPerTemp; i++) {
-            int costI = hpwl(core, p);
-            int oldPos = rand() % (p.nx * p.ny);
-            int newPos = rand() % (p.nx * p.ny);
-
-            swap(oldPos / p.ny, oldPos % p.ny, newPos / p.ny, newPos % p.ny, core, p);
-
-            int costF = hpwl(core, p);
-            int deltaCost = costF - costI;
-
-            if (deltaCost > 0 && (rand() / (RAND_MAX + 1.0)) >= exp(-deltaCost / temp)) {
-                // Revert the move
-                swap(oldPos / p.ny, oldPos % p.ny, newPos / p.ny, newPos % p.ny, core, p);
-            }
-        }
-
-        printToConsole(core, p);
-
-        if (hpwl(core, p) == 0) {
-            break;
-        }
-        temp = COOLING_RATE * temp;
-    }
-
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop - start);
-    cout << "simulatedAnnealing Execution Time: " << duration.count() << " microseconds" << endl;
-}
-
-int main() {
-    auto start = high_resolution_clock::now();
-
-    srand(time(NULL));
-
-    Placer p = makePlacer("d0.txt");
-    vector<int> core = makeCore(p);
-
-    placeRandomly(core, p);
-    printToConsole(core, p);
-
-    simulatedAnnealing(p, core);
-
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop - start);
-    cout << "main Execution Time: " << duration.count() << " microseconds" << endl;
-
-    return 0;
-}
-*/
